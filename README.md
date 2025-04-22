@@ -9,7 +9,7 @@
 ```mermaid
 %% Roadmap Timeline (Gantt Chart)
 gantt
-    title Polling Platform Development Roadmap
+    title SMART dPolls Roadmap
     dateFormat  YYYY-MM-DD
     axisFormat %b %d
 
