@@ -44,11 +44,12 @@ flowchart TD
     B --> B1[Add Title/Options]
     B1 --> B2[Configure Settings]
     B2 --> B3{Publish?}
-    B3 -->|Yes| C[Poll Active]
+    B3 -->|Yes| C[AA Payment]
     B3 -->|No| D[Save Draft]
 
     C --> E[User Submits Response]
-    E --> F[View Results]
+    E --> E1[AA Payment]
+    E1 --> F[View Results]
     F --> G[Share Results]
 
     C --> H[Modify Poll]
