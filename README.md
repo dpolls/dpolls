@@ -30,6 +30,7 @@ gantt
     Viewing Results           :b5, 2024-05-26, 14d
     Modifying Polls           :b6, 2024-05-26, 28d
     Deactivating Polls        :b7, 2024-06-09, 14d
+    Rewarding Users           :b8, 2024-06-09, 14d
 ```
 
 ## System Architecture
