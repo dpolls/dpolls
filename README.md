@@ -38,3 +38,24 @@ gantt
 
 ## User Journey
 
+```mermaid
+flowchart TD
+    A[Start] --> B[Create Poll]
+    B --> B1[Add Title/Options]
+    B1 --> B2[Configure Settings]
+    B2 --> B3{Publish?}
+    B3 -->|Yes| C[Poll Active]
+    B3 -->|No| D[Save Draft]
+
+    C --> E[User Submits Response]
+    E --> F[View Results]
+    F --> G[Share Results]
+
+    C --> H[Modify Poll]
+    H --> H1[Edit Title/Options]
+    H1 --> H2[Update Poll]
+
+    C --> I[Deactivate Poll]
+    I --> I1[Confirm Closure]
+    I1 --> J[Poll Archived]
+```
