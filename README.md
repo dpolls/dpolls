@@ -65,4 +65,4 @@ flowchart TD
 
 ## Prototype
 
-https://www.figma.com/proto/5kgnPOEZCDkss8t60HpXC0/SMART-dPolls?node-id=218-354&p=f&t=891hx8VhFi0ch2L4-1&scaling=min-zoom&content-scaling=fixed&page-id=212%3A225&starting-point-node-id=218%3A242
+[Figma Prototype](https://www.figma.com/proto/5kgnPOEZCDkss8t60HpXC0/SMART-dPolls?node-id=218-242&starting-point-node-id=218%3A242&locale=en#no_universal_links)
