@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { useWallet } from '../../context/WalletContext';
-import { mintNFT } from '../../utils/aaUtils';
-import { PaymentType } from '../../types/wallet';
-import './MintButton.css';
+import React, { useState } from "react";
+import { useWallet } from "../../context/WalletContext";
+import { mintNFT } from "../../utils/aaUtils";
+import { PaymentType } from "../../types/wallet";
+import "./MintButton.css";
+import { PollState } from "../../types/poll";
+import { poll } from "ethers/lib/utils";
 
 interface MintButtonProps {
   recipientAddress: string;
+  pollForm: PollState;
   selectedToken: string;
   paymentType: PaymentType;
   gasMultiplier: number;
@@ -18,27 +21,28 @@ interface MintButtonProps {
  */
 const MintButton: React.FC<MintButtonProps> = ({
   recipientAddress,
+  pollForm,
   selectedToken,
   paymentType,
   gasMultiplier,
   onMintSuccess,
-  onMintError
+  onMintError,
 }) => {
   const { walletState } = useWallet();
   const [isMinting, setIsMinting] = useState<boolean>(false);
-  const [mintStatus, setMintStatus] = useState<string>('');
-  const [mintError, setMintError] = useState<string>('');
+  const [mintStatus, setMintStatus] = useState<string>("");
+  const [mintError, setMintError] = useState<string>("");
 
   // Handle mint action
   const handleMint = async () => {
     if (!walletState.smartAccount || !recipientAddress || !walletState.signer) {
-      setMintError('Wallet, signer, or recipient address not available');
+      setMintError("Wallet, signer, or recipient address not available");
       return;
     }
 
     setIsMinting(true);
-    setMintStatus('Initializing transaction...');
-    setMintError('');
+    setMintStatus("Initializing transaction...");
+    setMintError("");
 
     try {
       // Update user on progress
@@ -57,15 +61,15 @@ const MintButton: React.FC<MintButtonProps> = ({
         paymentType,
         selectedToken,
         {
-          gasMultiplier: gasMultiplier
+          gasMultiplier: gasMultiplier,
         }
       );
 
-      setMintStatus('Transaction completed!');
+      setMintStatus("Transaction completed!");
       onMintSuccess(result.transactionHash);
     } catch (error) {
-      console.error('Error minting NFT:', error);
-      setMintError('Failed to mint NFT. Please try again.');
+      console.error("Error minting NFT:", error);
+      setMintError("Failed to mint NFT. Please try again.");
       onMintError(error as Error);
     } finally {
       setIsMinting(false);
@@ -73,17 +77,28 @@ const MintButton: React.FC<MintButtonProps> = ({
   };
 
   const canMint = (): boolean => {
-    const hasRequiredInput = Boolean(walletState.isConnected && recipientAddress);
-    
+    const hasRequiredPollInput = Boolean(
+      walletState.isConnected &&
+        pollForm &&
+        pollForm.subject &&
+        pollForm.options &&
+        pollForm.options.length > 0 &&
+        pollForm.duration &&
+        pollForm.rewardPerResponse &&
+        pollForm.maxResponses
+    );
+
     // For sponsored payment, we only need the wallet and recipient
     // Handle both enum value and string representation
-    if (paymentType === PaymentType.Sponsored || 
-        (typeof paymentType === 'string' && paymentType === 'SPONSORED')) {
-      return hasRequiredInput;
+    if (
+      paymentType === PaymentType.Sponsored ||
+      (typeof paymentType === "string" && paymentType === "SPONSORED")
+    ) {
+      return hasRequiredPollInput;
     }
-    
+
     // For token payment, we also need a selected token
-    return hasRequiredInput && Boolean(selectedToken);
+    return hasRequiredPollInput && Boolean(selectedToken);
   };
 
   return (
@@ -91,9 +106,9 @@ const MintButton: React.FC<MintButtonProps> = ({
       <button
         onClick={handleMint}
         disabled={isMinting || !canMint()}
-        className={`btn btn-primary mint-btn ${isMinting ? 'minting' : ''}`}
+        className={`btn btn-primary mint-btn ${isMinting ? "minting" : ""}`}
       >
-        {isMinting ? 'Creating Poll...' : 'Create Poll'}
+        {isMinting ? "Creating Poll..." : "Create Poll"}
       </button>
 
       {isMinting && mintStatus && (
@@ -112,4 +127,4 @@ const MintButton: React.FC<MintButtonProps> = ({
   );
 };
 
-export default MintButton; 
+export default MintButton;

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, Select, Space } from 'antd';
+import { Button, Form, Input, InputNumber, Select, Space } from 'antd';
 import { useGasPrice } from '../../context/GasPriceContext';
 import './AdvancedSettings.css';
+import { PollState } from '../../types/poll';
 
 const { Option } = Select;
 
@@ -15,7 +16,7 @@ const tailLayout = {
 };
 
 interface PollFormProps {
-  gasMultiplier: number;
+  pollForm: PollState;
   onFormChange: (form: object) => void;
 }
 
@@ -23,7 +24,7 @@ interface PollFormProps {
  * Component for advanced settings like gas multiplier
  */
 const PollForm: React.FC<PollFormProps> = ({
-  gasMultiplier,
+  pollForm,
   onFormChange
 }) => {
   const [form] = Form.useForm();
@@ -50,16 +51,22 @@ const PollForm: React.FC<PollFormProps> = ({
     setOptions([...options, `Option ${options.length + 1}`]);
   }
 
-  const onFinish = (values: any) => {
-    console.log(values);
-  };
+  const onUpdateOption = (value: any, index: number) => {
+    options[index] = value;
+    pollForm.options = options;
+    onFormChange({ ...pollForm });
+  }
 
   const onReset = () => {
     form.resetFields();
   };
 
-  const onFill = () => {
-    form.setFieldsValue({ note: 'Hello world!', gender: 'male' });
+  const onFill = (value: any) => {
+    console.log('Received values of form: ', value);
+    form.setFieldsValue(value);
+    pollForm = { ...pollForm, ...value };
+    console.log('Updated pollForm:', pollForm);
+    onFormChange(pollForm);
   };
 
   return (
@@ -67,27 +74,29 @@ const PollForm: React.FC<PollFormProps> = ({
       {...layout}
       form={form}
       name="control-hooks"
-      onFinish={onFinish}
       style={{ maxWidth: 600 }}
     >
       <Form.Item name="subject" label="Subject" rules={[{ required: true }]}>
-        <Input />
+        <Input onChange={(e) => onFill({subject: e.target.value})}/>
       </Form.Item>
       {options.map((option, index) => (
         <Form.Item key={index} name={`option${index}`} label={`Option ${index + 1}`} rules={[{ required: true }]}>
-          <Input />
+          <Input onChange={(e) => onUpdateOption(e.target.value, index)} />
         </Form.Item>
       ))}
+      <Form.Item name="duration" label="Duration" rules={[{ required: true }]}>
+        <InputNumber onChange={(value) => onFill({duration: value})}/>
+      </Form.Item>
+      <Form.Item name="rewardPerResponse" label="Reward Per Response" rules={[{ required: true }]}>
+        <InputNumber onChange={(value) => onFill({rewardPerResponse: value})}/>
+      </Form.Item>
+      <Form.Item name="maxResponses" label="Max Responses" rules={[{ required: true }]}>
+        <InputNumber onChange={(value) => onFill({maxResponses: value})}/>
+      </Form.Item>
       <Form.Item {...tailLayout}>
         <Space>
           <Button type="primary" onClick={onAddOption}>
             Add Option
-          </Button>
-          <Button htmlType="button" onClick={onReset}>
-            Reset
-          </Button>
-          <Button type="link" htmlType="button" onClick={onFill}>
-            Fill form
           </Button>
         </Space>
       </Form.Item>

@@ -15,7 +15,16 @@ import ApiKeyInput from './ApiKeyInput';
 import { toast } from 'react-toastify';
 import './MintOperationContainer.css';
 import PollForm from './PollForm';
+import { PollState } from '../../types/poll';
 
+// Default wallet state
+const defaultPollsState: PollState = {
+  subject: '',
+  options: [],
+  duration: 0,
+  rewardPerResponse: 0,
+  maxResponses: 0,
+};
 
 /**
  * Main container component that orchestrates the NFT minting flow
@@ -30,6 +39,7 @@ const MintOperationContainer: React.FC = () => {
   const [selectedToken, setSelectedToken] = useState<string>('');
   const [paymentType, setPaymentType] = useState<string>('SPONSORED');
   const [gasMultiplier, setGasMultiplier] = useState<number>(1);
+  const [pollForm, setPollForm] = useState<PollState>(defaultPollsState);
   
   // Transaction state
   const [requiredAllowance, setRequiredAllowance] = useState<string>('0');
@@ -98,7 +108,7 @@ const MintOperationContainer: React.FC = () => {
   };
   
   const handleFormChange = (values: any) => {
-    console.log('form values', values);
+    console.log('handleFormChange', pollForm);
   }
 
   // Handle approval completion
@@ -249,13 +259,14 @@ const MintOperationContainer: React.FC = () => {
             />
             
             <PollForm
-              gasMultiplier={gasMultiplier}
+              pollForm={pollForm}
               onFormChange={handleFormChange}
             />
 
             {/* Mint Button */}
             <MintButton 
               recipientAddress={recipientAddress}
+              pollForm={pollForm}
               selectedToken={selectedToken}
               paymentType={paymentType === 'SPONSORED' ? 0 : paymentType === 'PREPAY' ? 1 : 2}
               gasMultiplier={gasMultiplier}
