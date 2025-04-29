@@ -17,7 +17,7 @@ const tailLayout = {
 
 interface PollFormProps {
   pollForm: PollState;
-  onFormChange: (form: object) => void;
+  onFormChange: (form: PollState) => void;
 }
 
 /**
@@ -54,7 +54,7 @@ const PollForm: React.FC<PollFormProps> = ({
   const onUpdateOption = (value: any, index: number) => {
     options[index] = value;
     pollForm.options = options;
-    onFormChange({ ...pollForm });
+    onFormChange(pollForm);
   }
 
   const onReset = () => {
@@ -62,10 +62,8 @@ const PollForm: React.FC<PollFormProps> = ({
   };
 
   const onFill = (value: any) => {
-    console.log('Received values of form: ', value);
     form.setFieldsValue(value);
     pollForm = { ...pollForm, ...value };
-    console.log('Updated pollForm:', pollForm);
     onFormChange(pollForm);
   };
 
@@ -79,11 +77,6 @@ const PollForm: React.FC<PollFormProps> = ({
       <Form.Item name="subject" label="Subject" rules={[{ required: true }]}>
         <Input onChange={(e) => onFill({subject: e.target.value})}/>
       </Form.Item>
-      {options.map((option, index) => (
-        <Form.Item key={index} name={`option${index}`} label={`Option ${index + 1}`} rules={[{ required: true }]}>
-          <Input onChange={(e) => onUpdateOption(e.target.value, index)} />
-        </Form.Item>
-      ))}
       <Form.Item name="duration" label="Duration" rules={[{ required: true }]}>
         <InputNumber onChange={(value) => onFill({duration: value})}/>
       </Form.Item>
@@ -93,6 +86,11 @@ const PollForm: React.FC<PollFormProps> = ({
       <Form.Item name="maxResponses" label="Max Responses" rules={[{ required: true }]}>
         <InputNumber onChange={(value) => onFill({maxResponses: value})}/>
       </Form.Item>
+      {options.map((option, index) => (
+        <Form.Item key={index} name={`option${index}`} label={`Option ${index + 1}`} rules={[{ required: true }]}>
+          <Input onChange={(e) => onUpdateOption(e.target.value, index)} />
+        </Form.Item>
+      ))}
       <Form.Item {...tailLayout}>
         <Space>
           <Button type="primary" onClick={onAddOption}>

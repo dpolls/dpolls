@@ -107,8 +107,9 @@ const MintOperationContainer: React.FC = () => {
     setGasMultiplier(multiplier);
   };
   
-  const handleFormChange = (values: any) => {
-    console.log('handleFormChange', pollForm);
+  const handleFormChange = (newPollForm: PollState) => {
+    console.log('handleFormChange', newPollForm);
+    setPollForm(newPollForm)
   }
 
   // Handle approval completion

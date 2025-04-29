@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useWallet } from "../../context/WalletContext";
 import { mintNFT } from "../../utils/aaUtils";
+import { createPoll } from "../../utils/aaPollUtils";
 import { PaymentType } from "../../types/wallet";
 import "./MintButton.css";
 import { PollState } from "../../types/poll";
@@ -35,7 +36,7 @@ const MintButton: React.FC<MintButtonProps> = ({
 
   // Handle mint action
   const handleMint = async () => {
-    if (!walletState.smartAccount || !recipientAddress || !walletState.signer) {
+    if (!walletState.smartAccount || !walletState.signer) {
       setMintError("Wallet, signer, or recipient address not available");
       return;
     }
@@ -54,9 +55,10 @@ const MintButton: React.FC<MintButtonProps> = ({
       const metadataUri = "https://neroapi.com/nfts/metadata/sample";
 
       // Perform mint operation
-      const result = await mintNFT(
+      const result = await createPoll(
         walletState.signer,
         recipientAddress,
+        pollForm,
         metadataUri, // NFT metadata URI
         paymentType,
         selectedToken,
