@@ -1,0 +1,72 @@
+.api-key-manager {
+  margin-bottom: 1.5rem;
+}
+
+.api-key-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.api-key-header h3 {
+  margin: 0;
+}
+
+.api-key-status {
+  display: flex;
+  align-items: center;
+}
+
+.api-key-status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.api-key-status-badge.success {
+  background-color: var(--nero-success);
+  color: var(--nero-white);
+}
+
+.api-key-form {
+  margin-bottom: 0.75rem;
+}
+
+.api-key-input-group {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.api-key-input-group .input-field {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.api-key-input-group .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.api-key-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.api-key-help {
+  font-size: 0.85rem;
+  color: var(--nero-gray-600);
+}
+
+.api-key-help a {
+  color: var(--nero-black);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.api-key-help a:hover {
+  text-decoration: underline;
+} 
