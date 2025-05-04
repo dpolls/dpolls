@@ -1,4 +1,4 @@
-export const ERC20_ABI_OLD = [
+export const ERC20_ABI = [
   // Read-Only Functions
   'function balanceOf(address owner) view returns (uint256)',
   'function decimals() view returns (uint8)',
@@ -14,7 +14,7 @@ export const ERC20_ABI_OLD = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ]
 
-export const ERC20_ABI = [
+export const ERC20_ABI_DPOLLS = [
   // Simple ERC721 functions we need
   'function createPoll(string, string[], uint256, uint256, uint256) external payable',
   'function closePoll(uint256)',

@@ -1,11 +1,28 @@
 import { useState, useEffect } from 'react'
-import { ERC20_ABI } from '@/constants/abi'
+import { ethers } from 'ethers';
+import { ERC20_ABI_DPOLLS } from '@/constants/abi'
+import { CONTRACT_ADDRESSES } from '@/constants/contracts'
 // import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json'
-import { useSignature, useSendUserOp } from '@/hooks'
+import { useEthersSigner, useSignature, useSendUserOp } from '@/hooks'
+
+export const getSigner = async () => {
+  if (!window.ethereum) {
+    throw new Error("No crypto wallet found. Please install MetaMask.");
+  }
+
+  await window.ethereum.request({ method: "eth_requestAccounts" });
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  console.log("Connected wallet address:", await signer.getAddress());
+  return signer;
+};
 
 const Sample = () => {
   const { AAaddress, isConnected } = useSignature()
   const { execute, waitForUserOpResult, checkUserOpStatus } = useSendUserOp()
+  const signer = useEthersSigner();
+  console.log('ethers signer', signer)
+
   const [isLoading, setIsLoading] = useState(false)
   const [userOpHash, setUserOpHash] = useState<string | null>(null)
   const [txStatus, setTxStatus] = useState<string>('')
@@ -50,17 +67,51 @@ const Sample = () => {
       return
     }
 
+    const signer2 = await getSigner();
+    console.log('signer2', signer2)
+
     setIsLoading(true)
     setUserOpHash(null)
     setTxStatus('')
 
+    const pollForm = {
+      subject: 'Sample Poll',
+      options: ['Option 1', 'Option 2', 'Option 3'],
+      rewardPerResponse: 1,
+      duration: 10, // 1 hour
+      maxResponses: 10,
+    }
+
     try {
+      const amountInWei = ethers.utils.parseEther("0.1");
+      // const erc20 = new ethers.Contract(
+      //   CONTRACT_ADDRESSES.dpollsContract,
+      //   ERC20_ABI_DPOLLS,
+      //   signer
+      // );
+      // await erc20.approve(
+      //   CONTRACT_ADDRESSES.dpollsContract,
+      //   amountInWei);
       await execute({
         function: 'approve',
-        contractAddress: '0xC86Fed58edF0981e927160C50ecB8a8B05B32fed',
-        abi: ERC20_ABI,
+        contractAddress: CONTRACT_ADDRESSES.dpollsContract,
+        abi: ERC20_ABI_DPOLLS,
         value: 0,
-        params: ['0x5a6680dfd4a77feea0a7be291147768eaa2414ad', BigInt(1000000000000000000)],
+        params: [signer?.getAddress(), amountInWei],
+      })
+      
+      await execute({
+        function: 'createPoll',
+        contractAddress: CONTRACT_ADDRESSES.dpollsContract,
+        abi: ERC20_ABI_DPOLLS,
+        value: 0,
+        params: [
+          pollForm.subject,
+          pollForm.options,
+          pollForm.rewardPerResponse,
+          pollForm.duration,
+          pollForm.maxResponses
+        ],
       })
 
       // await execute({

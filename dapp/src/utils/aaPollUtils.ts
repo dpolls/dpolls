@@ -635,7 +635,7 @@ export const createPoll = async (
           CONTRACT_ADDRESSES.dpollsContract,
           [
             // Simple ERC721 functions we need
-            'function createPoll(string, string[], uint256, uint256, uint256)',
+            'function createPoll(string, string[], uint256, uint256, uint256) external payable',
             'function closePoll(uint256)',
             'function getAllPollIds(uint256) view returns (uint256[])',
             'function getOptions(uint256) view returns (string[])',
