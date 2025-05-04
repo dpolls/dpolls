@@ -28,7 +28,7 @@ const config = {
       aa: {
         bundler: 'https://bundler.service.nerochain.io',
         paymaster: 'https://paymaster-testnet.nerochain.io',
-        paymasterAPIKey: '',
+        paymasterAPIKey: import.meta.env.VITE_TESTNET_PAYMASTER_API ?? '',
       },
       aaContracts: {
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
@@ -84,7 +84,7 @@ const config = {
       aa: {
         bundler: 'https://bundler-mainnet.nerochain.io',
         paymaster: 'https://paymaster-mainnet.nerochain.io',
-        paymasterAPIKey: "",
+        paymasterAPIKey: import.meta.env.VITE_MAINNET_PAYMASTER_API ?? '',
       },
       aaContracts: {
         entryPoint: '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789',
