@@ -1,0 +1,42 @@
+.token-selector {
+  margin-bottom: 1rem;
+}
+
+.token-selector label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--nero-gray-700);
+}
+
+.token-selector .select-field {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--nero-gray-300);
+  margin-bottom: 0.5rem;
+}
+
+.token-selector .select-field:focus {
+  border-color: var(--nero-primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.2);
+}
+
+.token-info-note {
+  font-size: 0.85rem;
+  color: var(--nero-gray-600);
+  margin-top: 0.25rem;
+}
+
+.tokens-not-loaded {
+  padding: 8px;
+  background-color: var(--nero-gray-100);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+} 

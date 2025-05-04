@@ -1,0 +1,68 @@
+.gas-price-section {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.gas-price-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.gas-price-header h3 {
+  margin: 0;
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gas-price-info {
+  background-color: var(--nero-gray-100);
+  border-radius: var(--nero-border-radius);
+  padding: 1rem;
+  border: 1px solid var(--nero-gray-200);
+}
+
+.gas-price-value {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.gas-price-label {
+  font-weight: 500;
+  color: var(--nero-gray-700);
+}
+
+.gas-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--nero-black);
+}
+
+.gas-price-updated {
+  font-size: 0.8rem;
+  color: var(--nero-gray-600);
+  margin-bottom: 0.5rem;
+}
+
+.gas-price-note {
+  font-size: 0.85rem;
+  color: var(--nero-gray-600);
+  font-style: italic;
+}
+
+.gas-price-note p {
+  margin: 0;
+}
+
+.gas-price-unavailable {
+  color: var(--nero-danger);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+} 

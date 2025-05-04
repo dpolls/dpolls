@@ -1,0 +1,71 @@
+.mint-button-container {
+  margin: 1.5rem 0;
+}
+
+.mint-btn {
+  min-width: 180px;
+  font-size: 1.1rem;
+  padding: 10px 20px;
+  background-color: var(--nero-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.mint-btn:hover:not(:disabled) {
+  background-color: var(--nero-primary-dark);
+}
+
+.mint-btn:disabled {
+  background-color: var(--nero-gray-400);
+  cursor: not-allowed;
+}
+
+.mint-btn.minting {
+  position: relative;
+  background-color: var(--nero-primary-light);
+}
+
+.mint-status {
+  margin-top: 1rem;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: var(--nero-info-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-text {
+  font-size: 0.9rem;
+  color: var(--nero-info);
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 119, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--nero-primary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.mint-error {
+  margin-top: 1rem;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: var(--nero-error-light);
+}
+
+.error-message {
+  color: var(--nero-error);
+  font-size: 0.9rem;
+  margin: 0;
+} 
