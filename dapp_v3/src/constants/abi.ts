@@ -14,6 +14,16 @@ export const ERC20_ABI = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ]
 
+export const ERC20_ABI_DPOLLS = [
+  // Simple ERC721 functions we need
+  'function createPoll(string, string[], uint256, uint256, uint256) external payable',
+  'function closePoll(uint256)',
+  'function getAllPollIds(uint256) view returns (uint256[])',
+  'function getOptions(uint256) view returns (string[])',
+  'function getPoll(uint256) view returns (address, string, string[], uint256, uint256, uint256, bool, uint256, uint256)',
+  'function getPollStatus(uint256) view returns (bool, uint256, uint256)'
+]
+
 export const ERC721_ABI = [
   // Read-Only Functions
   'function name() view returns (string)',

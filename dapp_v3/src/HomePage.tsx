@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { useSignature, useSendUserOp, useConfig } from '@/hooks';
-import {ERC721_ABI } from '@/constants/abi';
+import { ERC20_ABI_DPOLLS,  } from '@/constants/abi';
+import { CONTRACT_ADDRESSES } from '@/constants/contracts'
 import { ethers } from 'ethers';
 
 // Import ABIs
 import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json';
 
 // Define NeroNFT ABI with the mint function
-const NERO_NFT_ABI = [
+const NERO_POLL_ABI = [
   // Basic ERC721 functions from the standard ABI
-  ...ERC721_ABI,
+  ...ERC20_ABI_DPOLLS,
   // Add the mint function that exists in the NeroNFT contract
   'function mint(address to, string memory uri) returns (uint256)',
   'function tokenURI(uint256 tokenId) view returns (string memory)',
@@ -114,13 +115,27 @@ const HomePage = () => {
         attributes: []
       });
 
+      const pollForm = {
+        subject: 'Sample Poll',
+        options: ['Option 1', 'Option 2', 'Option 3'],
+        rewardPerResponse: 1,
+        duration: 10, // 1 hour
+        maxResponses: 10,
+      }
+      const amountInWei = ethers.utils.parseEther("0.1");
 
       await execute({
-        function: 'mint',
-        contractAddress: FREE_NFT_ADDRESS,
-        abi: NERO_NFT_ABI, // Use the specific ABI with mint function
-        params: [AAaddress, nftImageUrl], // In a production app, use the IPFS URI of the metadata
-        value: 0,
+        function: 'createPoll',
+        contractAddress: CONTRACT_ADDRESSES.dpollsContract,
+        abi: NERO_POLL_ABI, // Use the specific ABI with mint function
+        params: [
+          pollForm.subject,
+          pollForm.options,
+          pollForm.rewardPerResponse,
+          pollForm.duration,
+          pollForm.maxResponses
+        ],
+        value: amountInWei,
       });
 
       const result = await waitForUserOpResult();
