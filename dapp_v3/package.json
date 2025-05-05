@@ -1,7 +1,6 @@
 {
   "name": "nero-wallet",
   "version": "0.0.0",
-  "type": "module",
   "main": "./dist/app/bundle.js",
   "module": "./dist/app/bundle.js",
   "types": "./dist/types/index.d.ts",
