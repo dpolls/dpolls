@@ -1,8 +1,17 @@
-import { useState } from 'react';
-import { useSignature, useSendUserOp, useConfig } from '@/hooks';
+import { useState, useContext } from 'react';
+import { useSignature, useSendUserOp, useConfig, useEthersSigner } from '@/hooks';
 import { ERC20_ABI_DPOLLS,  } from '@/constants/abi';
 import { CONTRACT_ADDRESSES } from '@/constants/contracts'
+import { ClientContext, SignatureContext } from '@/contexts'
 import { ethers } from 'ethers';
+import {
+  UserOperation,
+  UserOperationResultInterface,
+  SendUserOpContextProps,
+  ProviderProps,
+  DAppTransactionData,
+} from '@/types'
+import { executeDAppTransaction } from '@/helper/executeTransaction';
 
 // Import ABIs
 import CreateTokenFactory from '@/abis/ERC20/CreateTokenFactory.json';
@@ -18,18 +27,25 @@ const NERO_POLL_ABI = [
 
 // Contract addresses for the testnet - you would need to update these with actual addresses
 const TOKEN_FACTORY_ADDRESS = '0x00ef47f5316A311870fe3F3431aA510C5c2c5a90';
-const FREE_NFT_ADDRESS = '0x63f1f7c6a24294a874d7c8ea289e4624f84b48cb';
 
 const HomePage = () => {
   const [activeTab, setActiveTab] = useState('mint-nft');
-  const { AAaddress, isConnected } = useSignature();
-  const { execute, waitForUserOpResult } = useSendUserOp();
+  const { AAaddress, isConnected, simpleAccountInstance } = useSignature();
+  console.log('simpleAccountInstance:', simpleAccountInstance);
+
+  const client = useContext(ClientContext);
+
+  const signer = useEthersSigner()
+  console.log('signer:', signer);
+
+  const { execute, waitForUserOpResult, sendUserOp } = useSendUserOp();
   const config = useConfig(); // Get config to access RPC URL
   const [isLoading, setIsLoading] = useState(false);
   const [userOpHash, setUserOpHash] = useState<string | null>(null);
   const [txStatus, setTxStatus] = useState<string>('');
   const [isPolling, setIsPolling] = useState(false);
   const [nfts, setNfts] = useState<any[]>([]);
+  const [userOperations, setUserOperations] = useState<UserOperation[]>([])
   
   // Form state
   const [tokenName, setTokenName] = useState('');
@@ -48,7 +64,7 @@ const HomePage = () => {
     
     // If switching to NFT gallery, fetch the NFTs
     if (tab === 'nft-gallery' && isConnected) {
-      fetchNFTs();
+      fetchPolls();
     }
   };
 
@@ -64,6 +80,7 @@ const HomePage = () => {
     setTxStatus('');
 
     try {
+
       // Call the createToken function on the token factory contract
       await execute({
         function: 'createToken',
@@ -108,22 +125,18 @@ const HomePage = () => {
     setTxStatus('');
 
     try {
-      const metadataJson = JSON.stringify({
-        name: nftName,
-        description: nftDescription,
-        image: nftImageUrl,
-        attributes: []
-      });
-
       const pollForm = {
         subject: 'Sample Poll',
         options: ['Option 1', 'Option 2', 'Option 3'],
-        rewardPerResponse: 1,
-        duration: 10, // 1 hour
+        rewardPerResponse: ethers.utils.parseEther('0.1'),
+        duration: 10, // days
         maxResponses: 10,
+        minContribution: ethers.utils.parseEther('1').toString(),
+        targetFund: ethers.utils.parseEther('10').toString(),
       }
-      const amountInWei = ethers.utils.parseEther("0.1");
+      console.log('pollForm:', pollForm);
 
+      //*
       await execute({
         function: 'createPoll',
         contractAddress: CONTRACT_ADDRESSES.dpollsContract,
@@ -133,12 +146,16 @@ const HomePage = () => {
           pollForm.options,
           pollForm.rewardPerResponse,
           pollForm.duration,
-          pollForm.maxResponses
+          pollForm.maxResponses,
+          pollForm.minContribution,
+          pollForm.targetFund,
         ],
-        value: amountInWei,
+        value: 0,
       });
+      /* */
 
       const result = await waitForUserOpResult();
+      console.log('Result:', result);
       setUserOpHash(result.userOpHash);
       setIsPolling(true);
 
@@ -150,7 +167,7 @@ const HomePage = () => {
         setNftDescription('');
         setNftImageUrl('');
         // Refresh NFT gallery after successful mint
-        fetchNFTs();
+        fetchPolls();
       } else if (result.transactionHash) {
         setTxStatus('Transaction hash: ' + result.transactionHash);
       }
@@ -162,8 +179,7 @@ const HomePage = () => {
     }
   };
 
-  // Fetch NFTs for the gallery using direct RPC calls
-  const fetchNFTs = async () => {
+  const fetchPolls = async () => {
     if (!isConnected || !AAaddress) return;
 
     try {
@@ -174,39 +190,32 @@ const HomePage = () => {
       const provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
       
       // Create a contract instance for the NFT contract
-      const nftContract = new ethers.Contract(FREE_NFT_ADDRESS, NERO_NFT_ABI, provider);
+      const pollsContract = new ethers.Contract(
+        CONTRACT_ADDRESSES.dpollsContract,
+        ERC20_ABI_DPOLLS,
+         provider);
       
       // Get the balance of NFTs for the user
-      const balance = await nftContract.balanceOf(AAaddress);
-      const balanceNumber = parseInt(balance.toString());
-      
-      if (balanceNumber > 0) {
-        const fetchedNfts = [];
-        
+      const userPolls = await pollsContract.getUserPolls(AAaddress);
+      console.log("polls", userPolls)
+
+      if (userPolls.length > 0) {
+        const fetchedPolls: any[] = [];
+
         // Fetch each NFT the user owns
-        for (let i = 0; i < Math.min(balanceNumber, 10); i++) {
+        for (let i = 0; i < userPolls.length; i++) {
           try {
-            // This is a simplified approach - in a real app, you'd need to get tokenIds owned by the address
-            // For this demo, we're assuming sequential token IDs starting from 0
-            const tokenId = i;
-            
-            // Try to get the token URI
-            const tokenURI = await nftContract.tokenURI(tokenId);
-            
-            // Add to our NFTs array
-            fetchedNfts.push({
-              tokenId: tokenId.toString(),
-              tokenURI: tokenURI,
-              name: `NERO NFT #${tokenId}`,
-            });
+            const poll = userPolls[i];
+            console.log("poll", poll)
+            fetchedPolls.push(poll);
           } catch (error) {
-            console.error(`Error fetching NFT #${i}:`, error);
+            console.error(`Error fetching Poll #${i}:`, error);
           }
         }
         
-        if (fetchedNfts.length > 0) {
-          setNfts(fetchedNfts);
-          setTxStatus(`Found ${fetchedNfts.length} NFTs`);
+        if (fetchedPolls.length > 0) {
+          setNfts(fetchedPolls);
+          setTxStatus(`Found ${fetchedPolls.length} Polls`);
         } else {
           // If we couldn't fetch any NFTs even though balance > 0, show sample NFTs
           setNfts([
@@ -264,22 +273,16 @@ const HomePage = () => {
           className={`px-4 py-2 rounded-md ${activeTab === 'mint-nft' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
           onClick={() => handleTabChange('mint-nft')}
         >
-          Mint NFT
-        </button>
-        <button
-          className={`px-4 py-2 rounded-md ${activeTab === 'mint-token' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-          onClick={() => handleTabChange('mint-token')}
-        >
-          Mint Token
+          Create Poll
         </button>
         <button
           className={`px-4 py-2 rounded-md ${activeTab === 'nft-gallery' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
           onClick={() => {
             handleTabChange('nft-gallery');
-            fetchNFTs();
+            fetchPolls();
           }}
         >
-          NFT Gallery
+          Polls
         </button>
       </div>
 
@@ -382,7 +385,7 @@ const HomePage = () => {
           <div>
             <h2 className="text-xl font-semibold mb-4">Your NFT Gallery</h2>
             <button
-              onClick={fetchNFTs}
+              onClick={fetchPolls}
               disabled={isLoading}
               className="mb-4 px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-300"
             >
