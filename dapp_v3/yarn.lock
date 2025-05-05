@@ -3192,13 +3192,13 @@ __metadata:
   linkType: hard
 
 "@tanstack/react-query@npm:^5.50.1":
-  version: 5.75.1
-  resolution: "@tanstack/react-query@npm:5.75.1"
+  version: 5.75.2
+  resolution: "@tanstack/react-query@npm:5.75.2"
   dependencies:
     "@tanstack/query-core": 5.75.0
   peerDependencies:
     react: ^18 || ^19
-  checksum: cedb3a531b7f5d2541326d39eeacb403ffbc433fdfcc01648d1719a0e8fa267341cd6982dc333a5817bb8e8bb97b7763d8da6c1e729a8e754222bf0c2a571a79
+  checksum: 9fdfa5c327a477e31f7d5a2f87854e3904b4c6b8133ccc46d36fc2fedac0cf29802b87a80d3da6858b2b6903cda25d2f46c157f0675415837cb57d654057772d
   languageName: node
   linkType: hard
 
@@ -5324,9 +5324,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.30001702, caniuse-lite@npm:^1.0.30001716":
-  version: 1.0.30001716
-  resolution: "caniuse-lite@npm:1.0.30001716"
-  checksum: ff087ff38c339d0b697ef7862f575cdd0aeb5986a9c3660be97071c3b3c5ccf52380da73bb8397fdb8a528e4f05de009f6885219f7f6d908b1bff2d89334bfce
+  version: 1.0.30001717
+  resolution: "caniuse-lite@npm:1.0.30001717"
+  checksum: 357fbb230d86d28c0f7005d0c19a2274059ad4f1ed419ebe8754737ec908b567c9745abf0d16eda93417f40913221adc6290eb2f0432bc5bb5364f95bd7eabfa
   languageName: node
   linkType: hard
 
@@ -12442,11 +12442,11 @@ __metadata:
 
 "typescript@patch:typescript@^5.2.2#~builtin<compat/typescript>":
   version: 5.8.3
-  resolution: "typescript@patch:typescript@npm%3A5.8.3#~builtin<compat/typescript>::version=5.8.3&hash=379a07"
+  resolution: "typescript@patch:typescript@npm%3A5.8.3#~builtin<compat/typescript>::version=5.8.3&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 1b503525a88ff0ff5952e95870971c4fb2118c17364d60302c21935dedcd6c37e6a0a692f350892bafcef6f4a16d09073fe461158547978d2f16fbe4cb18581c
+  checksum: f1743b6850976b3debf7cbd53d2bc0b67e75d47eb6410db564c8bb475e92a8a48f8a3fcd14d89cf93426835281c31a8f8a94dad90be4dc899279a898532ba97f
   languageName: node
   linkType: hard
 
@@ -12869,8 +12869,8 @@ __metadata:
   linkType: hard
 
 "viem@npm:2.x, viem@npm:>=2.23.11, viem@npm:^2.1.1, viem@npm:^2.23.2, viem@npm:^2.8.13":
-  version: 2.28.3
-  resolution: "viem@npm:2.28.3"
+  version: 2.28.4
+  resolution: "viem@npm:2.28.4"
   dependencies:
     "@noble/curves": 1.8.2
     "@noble/hashes": 1.7.2
@@ -12885,7 +12885,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: ae92515636ff89fe415cabf68e5f427715d3b10bd42ca263749ee0a862e48f575d7a5127e5721c2f64f271b9830ae2fe6a533287a2aaf51bc1b0d4ec196f502b
+  checksum: 04e6e6e0617f004ff0cb70cf26b0f461299abf43f51b485ec42386dede8168a6d9a073420b3b2ef4fd1de4db286a0b915fb439f1d2512762ac61ca9bdf8bc5c3
   languageName: node
   linkType: hard
 
@@ -13362,9 +13362,9 @@ __metadata:
   linkType: hard
 
 "zod@npm:^3.23.8, zod@npm:^3.24.2":
-  version: 3.24.3
-  resolution: "zod@npm:3.24.3"
-  checksum: 9c3976e61cec25908f3405502abdf28ab1893afd5182c6739a30375c5c6bf4b9b6ea7e78735324e5ac63571c160ce607ebe320ff389b044223c357ccc2f8c94c
+  version: 3.24.4
+  resolution: "zod@npm:3.24.4"
+  checksum: 62829789765a9187bd72bed3972a7c1a39fdfe6c59bc752eedabec5f99af701658471b8577d22e0fee2081e6e35d4efc93c02c90e13350755a36feadbf72bbbc
   languageName: node
   linkType: hard
 
