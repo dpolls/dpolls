@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "vite",
     "dev:demo": "vite --mode demo",
-    "build": "ITE_USER_NODE_ENV=build tsc --project tsconfig.build.json && vite build --mode build",
+    "build": "VITE_USER_NODE_ENV=build tsc --project tsconfig.build.json && vite build --mode build",
     "build:demo": "vite build --mode demo",
     "build:env": "VITE_USER_NODE_ENV=build tsc --project tsconfig.build.json && vite build --mode build",
     "lint": "yarn lint:prettier && yarn lint:eslint",
