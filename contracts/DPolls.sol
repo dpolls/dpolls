@@ -21,22 +21,43 @@ contract PollsDApp {
         uint256 reward;
     }
 
-    struct Poll {
+    struct PollSettings {
+        uint256 rewardPerResponse;
+        uint256 maxResponses;
+        uint256 durationDays;
+        uint256 minContribution;
+        uint256 targetFund;
+        uint256 endTime;
+        uint256 totalResponses;
+        uint256 funds;
+    }
+
+    struct PollContent {
         address creator;
         string subject;
         string description;
-        string status; // "open", "closed", "cancelled"
+        string status;
         string[] options;
+        bool isOpen;
+    }
+
+    struct Poll {
+        PollContent content;
+        PollSettings settings;
         PollResponse[] responses;
+    }
+
+    struct PollView {
+        address creator;
+        string subject;
+        string description;
+        string[] options;
         uint256 rewardPerResponse;
         uint256 maxResponses;
         uint256 endTime;
-        uint256 durationDays;
         bool isOpen;
         uint256 totalResponses;
         uint256 funds;
-        uint256 minContribution;  // Minimum contribution amount for this poll
-        uint256 targetFund;      // Target/maximum fund amount for this poll
     }
 
     uint256 public pollCounter;
@@ -48,6 +69,41 @@ contract PollsDApp {
     event PollUpdated(uint256 pollId, address creator, string sub);
     event PollClosed(uint256 pollId);
     event TargetFundUpdated(uint256 pollId, uint256 oldTarget, uint256 newTarget);
+
+    function _initializePollContent(
+        address creator,
+        string memory subject,
+        string memory description,
+        string[] memory options
+    ) private pure returns (PollContent memory) {
+        return PollContent({
+            creator: creator,
+            subject: subject,
+            description: description,
+            status: "open",
+            options: options,
+            isOpen: true
+        });
+    }
+
+    function _initializePollSettings(
+        uint256 rewardPerResponse,
+        uint256 durationDays,
+        uint256 maxResponses,
+        uint256 minContribution,
+        uint256 targetFund
+    ) private view returns (PollSettings memory) {
+        return PollSettings({
+            rewardPerResponse: rewardPerResponse,
+            maxResponses: maxResponses,
+            durationDays: durationDays,
+            minContribution: minContribution,
+            targetFund: targetFund,
+            endTime: block.timestamp + (durationDays * 1 days),
+            totalResponses: 0,
+            funds: 0
+        });
+    }
 
     function createPoll(
         string memory subject,
@@ -65,16 +121,18 @@ contract PollsDApp {
         require(targetFund >= minContribution, "Target fund must be >= min contribution");
         require(targetFund >= rewardPerResponse * maxResponses, "Target fund must be greater than or equal to (reward per response x max responses)");
 
+        PollContent memory content = _initializePollContent(msg.sender, subject, description, options);
+        PollSettings memory settings = _initializePollSettings(
+            rewardPerResponse,
+            durationDays,
+            maxResponses,
+            minContribution,
+            targetFund
+        );
+
         Poll storage p = polls[pollCounter];
-        p.creator = msg.sender;
-        p.subject = subject;
-        p.description = description;
-        p.options = options;
-        p.rewardPerResponse = rewardPerResponse;
-        p.maxResponses = maxResponses;
-        p.durationDays = durationDays;
-        p.minContribution = minContribution;
-        p.targetFund = targetFund;
+        p.content = content;
+        p.settings = settings;
 
         pollIds.push(pollCounter);
         userPolls[msg.sender].push(p);
@@ -83,134 +141,140 @@ contract PollsDApp {
         pollCounter++;
     }
 
-    function submitResponse(uint256 pollId, string memory response) external nonReentrant payable {
+    function submitResponse(uint256 pollId, string memory response) external payable nonReentrant {
         Poll storage p = polls[pollId];
-        require(p.isOpen, "Poll is closed");
-        require(block.timestamp < p.endTime, "Poll has ended");
-        require(p.totalResponses < p.maxResponses, "Max responses reached");
+        require(p.content.isOpen, "Poll is closed");
+        require(block.timestamp < p.settings.endTime, "Poll has ended");
+        require(p.settings.totalResponses < p.settings.maxResponses, "Max responses reached");
 
-        PollResponse storage pr = p.responses[p.totalResponses + 1];
-        pr.responder = msg.sender;
-        pr.response = response;
-        pr.weight = 1; // Default weight
-        pr.timestamp = block.timestamp;
-        pr.isClaimed = false;
-        pr.reward = p.rewardPerResponse;
-
-        // Effects
-        p.responses.push(pr);
-        p.totalResponses++;
-
-        // No external calls after state changes
+        p.responses.push(PollResponse({
+            responder: msg.sender,
+            response: response,
+            weight: 1,
+            timestamp: block.timestamp,
+            isClaimed: false,
+            reward: p.settings.rewardPerResponse
+        }));
+        p.settings.totalResponses++;
     }
 
     function closePoll(uint256 pollId) external {
         Poll storage p = polls[pollId];
-        require(msg.sender == p.creator, "Not creator");
-        require(p.isOpen, "Already closed");
-        require(block.timestamp >= p.endTime || p.totalResponses >= p.maxResponses, "Too early");
+        require(msg.sender == p.content.creator, "Not creator");
+        require(p.content.isOpen, "Already closed");
+        require(block.timestamp >= p.settings.endTime || p.settings.totalResponses >= p.settings.maxResponses, "Too early");
 
-        p.isOpen = false;
-        p.status = "closed";
+        p.content.isOpen = false;
+        p.content.status = "closed";
         emit PollClosed(pollId);
     }
 
     function cancelPoll(uint256 pollId) external {
         Poll storage p = polls[pollId];
-        require(msg.sender == p.creator, "Not creator");
-        require(p.isOpen, "Already closed");
+        require(msg.sender == p.content.creator, "Not creator");
+        require(p.content.isOpen, "Already closed");
 
-        p.isOpen = false;
+        p.content.isOpen = false;
+        p.content.status = "cancelled";
         emit PollClosed(pollId);
     }
 
     function openPoll(uint256 pollId) external {
         Poll storage p = polls[pollId];
-        require(msg.sender == p.creator, "Not creator");
-        require(!p.isOpen, "Already open");
+        require(msg.sender == p.content.creator, "Not creator");
+        require(!p.content.isOpen, "Already open");
 
-        p.isOpen = true;
-        p.status = "open";
-        p.endTime = block.timestamp + (p.durationDays * 1 days);
-        emit PollUpdated(pollId, msg.sender, p.subject);
+        p.content.isOpen = true;
+        p.content.status = "open";
+        p.settings.endTime = block.timestamp + (p.settings.durationDays * 1 days);
+        emit PollUpdated(pollId, msg.sender, p.content.subject);
     }
 
     function getOptions(uint256 pollId) external view returns (string[] memory) {
-        return polls[pollId].options;
+        return polls[pollId].content.options;
     }
 
     function getPollStatus(uint256 pollId) external view returns (bool, uint256, uint256) {
         Poll storage p = polls[pollId];
-        return (p.isOpen, p.endTime, p.totalResponses);
+        return (p.content.isOpen, p.settings.endTime, p.settings.totalResponses);
     }
 
     function getAllPollIds() external view returns (uint256[] memory) {
         return pollIds;
     }
 
-    function getPoll(uint256 pollId) external view returns (
-        address creator,
-        string memory subject,
-        string memory description,
-        string[] memory options,
-        uint256 rewardPerResponse,
-        uint256 maxResponses,
-        uint256 endTime,
-        bool isOpen,
-        uint256 totalResponses,
-        uint256 funds
-    ) {
+    function getPoll(uint256 pollId) external view returns (PollView memory) {
         Poll storage p = polls[pollId];
-        return (
-            p.creator,
-            p.question,
-            p.options,
-            p.rewardPerResponse,
-            p.maxResponses,
-            p.endTime,
-            p.isOpen,
-            p.totalResponses,
-            p.funds
-        );
+        return PollView({
+            creator: p.content.creator,
+            subject: p.content.subject,
+            description: p.content.description,
+            options: p.content.options,
+            rewardPerResponse: p.settings.rewardPerResponse,
+            maxResponses: p.settings.maxResponses,
+            endTime: p.settings.endTime,
+            isOpen: p.content.isOpen,
+            totalResponses: p.settings.totalResponses,
+            funds: p.settings.funds
+        });
     }
 
-    // Get all polls for a user
+    function getPollResponses(uint256 pollId) external view returns (PollResponse[] memory) {
+        return polls[pollId].responses;
+    }
+
     function getUserPolls(address user) external view returns (Poll[] memory) {
         return userPolls[user];
     }
 
-    // Get all polls for a user
-    function getActivePolls(address user) external view returns (Poll[] memory) {
+    function getUserActivePolls(address user) external view returns (Poll[] memory) {
         return userPolls[user];
     }
 
-    // Function to update the target fund of a poll
-    function updateTargetFund(uint256 pollId, uint256 newTargetFund) external {
-        Poll storage p = polls[pollId];
-        require(msg.sender == p.creator, "Only creator can update target");
-        require(p.isOpen, "Poll is not open");
-        require(newTargetFund >= p.minContribution, "New target must be >= min contribution");
-        require(newTargetFund >= p.funds, "New target must be >= current funds");
+    function getActivePolls() external view returns (Poll[] memory) {
+        uint256 activeCount = 0;
+        
+        // First count active polls
+        for (uint256 i = 0; i < pollIds.length; i++) {
+            if (polls[pollIds[i]].content.isOpen) {
+                activeCount++;
+            }
+        }
+        
+        // Create array of active polls
+        Poll[] memory activePolls = new Poll[](activeCount);
+        uint256 currentIndex = 0;
+        
+        // Fill array with active polls
+        for (uint256 i = 0; i < pollIds.length; i++) {
+            if (polls[pollIds[i]].content.isOpen) {
+                activePolls[currentIndex] = polls[pollIds[i]];
+                currentIndex++;
+            }
+        }
+        
+        return activePolls;
+    }
 
-        uint256 oldTarget = p.targetFund;
-        p.targetFund = newTargetFund;
+    function updateTargetFund(uint256 pollId, uint256 newTargetFund) external payable nonReentrant {
+        Poll storage p = polls[pollId];
+        require(msg.sender == p.content.creator, "Only creator can update target");
+        require(p.content.isOpen, "Poll is not open");
+        require(newTargetFund >= p.settings.minContribution, "New target must be >= min contribution");
+        require(newTargetFund >= p.settings.funds, "New target must be >= current funds");
+
+        uint256 oldTarget = p.settings.targetFund;
+        p.settings.targetFund = newTargetFund;
         
         emit TargetFundUpdated(pollId, oldTarget, newTargetFund);
     }
 
-    // Function to add funds to an existing poll
     function fundPoll(uint256 pollId) external payable nonReentrant {
-        // Checks
         Poll storage p = polls[pollId];
-        require(p.isOpen, "Poll is not open");
-        require(msg.value >= p.minContribution, "Contribution below poll minimum");
-        require(p.funds + msg.value <= p.targetFund, "Would exceed poll's target fund");
+        require(p.content.isOpen, "Poll is not open");
+        require(msg.value >= p.settings.minContribution, "Contribution below poll minimum");
+        require(p.settings.funds + msg.value <= p.settings.targetFund, "Would exceed poll's target fund");
         
-        // Effects
-        uint256 newFunds = p.funds + msg.value;
-        p.funds = newFunds;
-        
-        // No external calls after state changes
+        p.settings.funds += msg.value;
     }
-
 }
