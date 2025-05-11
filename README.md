@@ -1,14 +1,22 @@
-# nero-polls
+---
+description: Official Documentation for NERO Decentralized Polls
+icon: hand-wave
+---
 
-* [Roadmap](#roadmap)
-* [System Architecture](#system-architecture)
-* [User Journey](#user-journey)
-* [Prototype](#prototype)
+# Nero dPolls
+
+Link to official documentation: [https://blurtopian.gitbook.io/dpolls](https://blurtopian.gitbook.io/dpolls)
+
+
+
+* [Roadmap](./#roadmap)
+* [System Architecture](./#system-architecture)
+* [User Journey](./#user-journey)
+* [Prototype](./#prototype)
 
 ## Roadmap
 
 Moved to https://github.com/eastmaels/nero-polls-dapp/tree/main
-
 
 ## System Architecture
 
@@ -41,4 +49,4 @@ flowchart TD
 
 ## Prototype
 
-[Figma Prototype](https://www.figma.com/proto/5kgnPOEZCDkss8t60HpXC0/SMART-dPolls?node-id=218-242&starting-point-node-id=218%3A242&locale=en#no_universal_links)
+[Figma Prototype](https://www.figma.com/proto/5kgnPOEZCDkss8t60HpXC0/SMART-dPolls?node-id=218-242\&starting-point-node-id=218%3A242\&locale=en#no_universal_links)
