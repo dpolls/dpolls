@@ -1,5 +1,0 @@
-export { default as ActivityContent } from './ActivityContent';
-export { default as ExpandedTabContent } from './ExpandedTabContent';
-export { default as NEROTokenContent } from './NEROTokenContent';
-export { default as NFTsContent } from './NFTsContent';
-export { default as TokensContent } from './TokenContent';

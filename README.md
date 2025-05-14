@@ -34,6 +34,10 @@ gantt
     Rewarding Users           :b8, 2024-06-09, 14d
 ```
 
+## Live Demo
+
+https://dpolls.vercel.app/
+
 ## System Architecture
 
 ![SMART dPolls System Architecture](https://github.com/user-attachments/assets/a40c31c7-fc07-4af2-9641-75cb2eb0f7f8)
@@ -63,6 +67,4 @@ flowchart TD
     I1 --> J[Poll Archived]
 ```
 
-## Prototype
 
-[Figma Prototype](https://www.figma.com/proto/5kgnPOEZCDkss8t60HpXC0/SMART-dPolls?node-id=218-242&starting-point-node-id=218%3A242&locale=en#no_universal_links)

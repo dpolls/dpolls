@@ -1,7 +1,0 @@
-dist/
-node_modules/
-build/
-coverage/
-eslint.config.js
-.yarn
-README.md
